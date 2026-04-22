@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
-use markdown_to_leaflet::parse_markdown_to_leaflet;
+use markdown_to_leaflet::markdown_to_leaflet_schema;
 
 /// Convert Markdown source into a JSON [`Value`].
 pub fn convert(md: &str) -> serde_json::Value {
-    let schema = parse_markdown_to_leaflet(md.as_bytes(), "test.md").unwrap();
+    let schema = markdown_to_leaflet_schema(md.as_bytes(), "test.md").unwrap();
     leaflet_protocol::emit_leaflet_document(&schema).unwrap()
 }
 

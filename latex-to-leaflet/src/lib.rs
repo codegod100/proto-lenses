@@ -1,32 +1,25 @@
 //! LaTeX → Leaflet.pub protolens.
 //!
 //! This crate converts `.tex` source files into Leaflet document schemas
-//! using the tree-sitter LaTeX grammar. It is kept outside the main
-//! `panproto-*` crates so that LaTeX-specific logic does not pollute the
-//! core library surface.
+//! using the tree-sitter LaTeX grammar and a declarative lens DSL spec.
 //!
 //! ## One-shot conversion
 //!
 //! ```
-//! use latex_to_leaflet::parse_latex_to_leaflet;
+//! use latex_to_leaflet::latex_to_leaflet_schema;
 //!
-//! let schema = parse_latex_to_leaflet(b"\\section{Hello} world.", "doc.tex")
+//! let schema = latex_to_leaflet_schema(br#"\section{Hello} world."#, "doc.tex")
 //!     .expect("convert");
 //! ```
-//!
-//! ## As a protolens
-//!
-//! The [`latex_to_leaflet_chain`] function returns a [`ProtolensChain`] that
-//! can be composed into larger migration pipelines, and
-//! [`latex_to_leaflet_identity_lens`] produces a concrete [`Lens`] from the
-//! parsed schema.
 
 use panproto_schema::Schema;
+use std::sync::LazyLock;
 
 pub mod parse;
+pub mod protocol;
 
 /// Re-export the core parser.
-pub use parse::parse_latex_to_leaflet;
+pub use parse::parse_latex;
 
 /// Errors from LaTeX → Leaflet conversion.
 #[derive(Debug, thiserror::Error)]
@@ -45,6 +38,10 @@ pub enum LaTeXLeafletError {
         path: String,
     },
 
+    /// A lens DSL operation failed.
+    #[error("lens DSL error: {0}")]
+    LensDsl(#[from] panproto_lens_dsl::LensDslError),
+
     /// A lens-related operation failed.
     #[error("lens error: {0}")]
     Lens(#[from] panproto_lens::LensError),
@@ -52,62 +49,38 @@ pub enum LaTeXLeafletError {
 
 /// Convert LaTeX source bytes into a Leaflet document [`Schema`].
 ///
-/// Thin wrapper around [`parse::parse_latex_to_leaflet`] that maps the
-/// crate-local error type to itself (present for API symmetry).
-///
 /// # Errors
 ///
 /// Returns [`LaTeXLeafletError`] if the LaTeX grammar is unavailable or
 /// parsing fails.
 pub fn latex_to_leaflet_schema(source: &[u8], file_path: &str) -> Result<Schema, LaTeXLeafletError> {
-    parse_latex_to_leaflet(source, file_path)
+    let latex_schema = parse_latex(source, file_path)?;
+    let chain = latex_to_leaflet_chain()?;
+    let proto = protocol::protocol();
+    let lens = chain.instantiate(&latex_schema, &proto)?;
+    Ok(lens.tgt_schema)
 }
 
-/// Return a [`ProtolensChain`] that converts LaTeX → Leaflet.
+/// Load and compile the LaTeX → Leaflet lens spec.
 ///
-/// The chain contains a single step: the LaTeX parser. Because the parser
-/// directly produces a Leaflet schema, no intermediate endofunctor transforms
-/// are needed.
-///
-/// # Errors
-///
-/// Returns [`LaTeXLeafletError`] if instantiation fails.
-pub fn latex_to_leaflet_chain() -> Result<panproto_lens::ProtolensChain, LaTeXLeafletError> {
-    Ok(panproto_lens::ProtolensChain::new(vec![]))
-}
+/// The spec is embedded at compile time from `theories/latex_to_leaflet.ncl`.
+fn latex_to_leaflet_chain()
+    -> Result<&'static panproto_lens::ProtolensChain, LaTeXLeafletError>
+{
+    static CHAIN: LazyLock<Result<panproto_lens::ProtolensChain, String>> = LazyLock::new(|| {
+        let source = include_str!("../theories/latex_to_leaflet.ncl");
+        panproto_lens_dsl::eval::eval_nickel(source, &[])
+            .and_then(|doc| panproto_lens_dsl::compile(&doc, "document", &|_| None))
+            .map(|c| c.chain)
+            .map_err(|e| e.to_string())
+    });
 
-/// Build a concrete [`Lens`] from a parsed LaTeX schema to itself.
-///
-/// Since the parser already outputs a Leaflet schema, the "lens" is
-/// effectively the identity on that schema. This function is useful when
-/// you need a [`Lens`] type to feed into a larger pipeline.
-///
-/// # Errors
-///
-/// Returns [`LaTeXLeafletError`] if schema construction fails.
-pub fn latex_to_leaflet_identity_lens(
-    schema: &Schema,
-) -> Result<panproto_lens::Lens, LaTeXLeafletError> {
-    let surviving_verts = schema.vertices.keys().cloned().collect();
-    let surviving_edges = schema.edges.keys().cloned().collect();
-
-    let compiled = panproto_inst::CompiledMigration {
-        surviving_verts,
-        surviving_edges,
-        vertex_remap: std::collections::HashMap::new(),
-        edge_remap: std::collections::HashMap::new(),
-        resolver: std::collections::HashMap::new(),
-        hyper_resolver: std::collections::HashMap::new(),
-        field_transforms: std::collections::HashMap::new(),
-        conditional_survival: std::collections::HashMap::new(),
-        expansion_path: std::collections::HashMap::new(),
-    };
-
-    Ok(panproto_lens::Lens {
-        compiled,
-        src_schema: schema.clone(),
-        tgt_schema: schema.clone(),
-    })
+    match &*CHAIN {
+        Ok(chain) => Ok(chain),
+        Err(e) => Err(LaTeXLeafletError::SchemaConstruction {
+            reason: e.clone(),
+        }),
+    }
 }
 
 /// Configuration for LaTeX → Leaflet conversion.

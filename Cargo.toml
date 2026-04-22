@@ -26,6 +26,7 @@ panproto-gat = { path = "../panproto/crates/panproto-gat", version = "0.30.0" }
 panproto-schema = { path = "../panproto/crates/panproto-schema", version = "0.30.0" }
 panproto-inst = { path = "../panproto/crates/panproto-inst", version = "0.30.0" }
 panproto-lens = { path = "../panproto/crates/panproto-lens", version = "0.30.0" }
+panproto-lens-dsl = { path = "../panproto/crates/panproto-lens-dsl", version = "0.30.0" }
 panproto-protocols = { path = "../panproto/crates/panproto-protocols", version = "0.30.0" }
 panproto-grammars = { path = "../panproto/crates/panproto-grammars", version = "0.30.0" }
 leaflet-protocol = { path = "leaflet-protocol" }

@@ -20,7 +20,7 @@ fn main() {
         process::exit(1);
     });
 
-    let schema = latex_to_leaflet::parse_latex_to_leaflet(&source, path).unwrap_or_else(|e| {
+    let schema = latex_to_leaflet::latex_to_leaflet_schema(&source, path).unwrap_or_else(|e| {
         eprintln!("Parse error: {}", e);
         process::exit(1);
     });

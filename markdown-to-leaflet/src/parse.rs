@@ -1,7 +1,7 @@
-//! Markdown → Leaflet.pub document converter.
+//! Markdown document parser.
 //!
-//! Parses CommonMark / GFM with `pulldown-cmark` and directly constructs a
-//! Leaflet [`Schema`].
+//! Parses CommonMark / GFM with `pulldown-cmark` and constructs a
+//! Markdown [`Schema`] using the markdown protocol.
 
 use panproto_schema::{Schema, SchemaBuilder};
 use pulldown_cmark::{Event, Tag, TagEnd};
@@ -9,13 +9,13 @@ use pulldown_cmark::{Event, Tag, TagEnd};
 use crate::unicode::latex_to_unicode;
 use crate::MarkdownLeafletError;
 
-/// Convert Markdown source bytes into a Leaflet document [`Schema`].
-pub fn parse_markdown_to_leaflet(
+/// Convert Markdown source bytes into a Markdown document [`Schema`].
+pub fn parse_markdown(
     source: &[u8],
     _file_path: &str,
 ) -> Result<Schema, MarkdownLeafletError> {
     let text = std::str::from_utf8(source).unwrap_or("");
-    let proto = leaflet_protocol::protocol();
+    let proto = crate::protocol::protocol();
     let builder = SchemaBuilder::new(&proto);
 
     let doc_id = "document";
@@ -110,7 +110,7 @@ fn flush_pending_text(
     if trimmed.len() <= 2 && trimmed.chars().all(|c| c.is_ascii_punctuation()) {
         return Ok(builder);
     }
-    add_block(parent_id, "text", builder, ctx, |b, id| {
+    add_block(parent_id, "paragraph", builder, ctx, |b, id| {
         Ok(b.constraint(id, "plaintext", trimmed))
     })
 }
@@ -140,7 +140,7 @@ fn add_block<F>(
 where
     F: FnOnce(SchemaBuilder, &str) -> Result<SchemaBuilder, MarkdownLeafletError>,
 {
-    let id = format!("{parent_id}:block:{}", ctx.block_counter);
+    let id = format!("{parent_id}:block:{:04}", ctx.block_counter);
     ctx.block_counter += 1;
 
     let builder = builder
@@ -159,13 +159,13 @@ fn add_list(
     builder: SchemaBuilder,
     ctx: &mut Context,
 ) -> Result<(SchemaBuilder, String), MarkdownLeafletError> {
-    let list_id = format!("{parent_id}:list:{}", ctx.block_counter);
+    let list_id = format!("{parent_id}:list:{:04}", ctx.block_counter);
     ctx.block_counter += 1;
 
     let mut builder = builder
         .vertex(&list_id, list_kind, None)
         .map_err(|e| err_schema(e))?;
-    if list_kind == "orderedList" {
+    if list_kind == "ordered_list" {
         builder = builder.constraint(&list_id, "startIndex", "1");
     }
     builder = builder
@@ -179,12 +179,12 @@ fn add_list_item(
     builder: SchemaBuilder,
     ctx: &mut Context,
 ) -> Result<(SchemaBuilder, String), MarkdownLeafletError> {
-    let item_id = format!("{list_id}:item:{}", ctx.block_counter);
+    let item_id = format!("{list_id}:item:{:04}", ctx.block_counter);
     ctx.block_counter += 1;
 
-    let builder = builder
-        .vertex(&item_id, "listItem", None)
-        .map_err(|e| err_schema(e))?;
+        let builder = builder
+            .vertex(&item_id, "list_item", None)
+            .map_err(|e| err_schema(e))?;
     let builder = builder
         .edge(list_id, &item_id, "items", None)
         .map_err(|e| err_schema(e))?;
@@ -255,9 +255,9 @@ impl EventWalker {
                                 self.stack.pop();
                             }
                             let list_kind = if start_num.is_some() {
-                                "orderedList"
+                                "ordered_list"
                             } else {
-                                "unorderedList"
+                                "unordered_list"
                             };
                             let (b, list_id) =
                                 add_list(&self.active_parent, list_kind, builder, ctx)?;
@@ -378,7 +378,7 @@ impl EventWalker {
                                 let level_str = (level as u64).to_string();
                                 builder = add_block(
                                     &self.active_parent,
-                                    "header",
+                                    "heading",
                                     builder,
                                     ctx,
                                     |b, id| {
@@ -398,7 +398,7 @@ impl EventWalker {
                                     .unwrap_or_else(|| "plaintext".to_string());
                                 builder = add_block(
                                     &self.active_parent,
-                                    "code",
+                                    "code_block",
                                     builder,
                                     ctx,
                                     |b, id| {
@@ -477,7 +477,7 @@ impl EventWalker {
                     builder = flush_pending_text(builder, &self.active_parent, ctx)?;
                     builder = add_block(
                         &self.active_parent,
-                        "horizontalRule",
+                        "thematic_break",
                         builder,
                         ctx,
                         |b, _id| Ok(b),
@@ -496,7 +496,7 @@ impl EventWalker {
                         self.stack.pop();
                     }
                     builder = flush_pending_text(builder, &self.active_parent, ctx)?;
-                    builder = add_block(&self.active_parent, "math", builder, ctx, |b, id| {
+                    builder = add_block(&self.active_parent, "math_block", builder, ctx, |b, id| {
                         Ok(b.constraint(id, "tex", &tex))
                     })?;
                 }

@@ -351,7 +351,8 @@ pub fn emit_leaflet_document(schema: &Schema) -> Result<serde_json::Value, Proto
     }
 
     let mut pages = Vec::new();
-    let page_children = children_by_edge(schema, &root.id, "items");
+    let mut page_children = children_by_edge(schema, &root.id, "items");
+    page_children.sort_by(|a, b| vertex_order_key(&a.1.id).cmp(&vertex_order_key(&b.1.id)));
 
     for (_edge, page) in &page_children {
         if page.kind != "page" {
@@ -359,7 +360,8 @@ pub fn emit_leaflet_document(schema: &Schema) -> Result<serde_json::Value, Proto
         }
 
         let mut blocks = Vec::new();
-        let block_children = children_by_edge(schema, &page.id, "items");
+        let mut block_children = children_by_edge(schema, &page.id, "items");
+        block_children.sort_by(|a, b| vertex_order_key(&a.1.id).cmp(&vertex_order_key(&b.1.id)));
 
         for (_edge, block) in &block_children {
             if let Ok(block_json) = emit_block(schema, block) {
@@ -451,12 +453,14 @@ fn emit_block(schema: &Schema, block: &panproto_schema::Vertex) -> Result<serde_
     // Emit children for list types.
     if block.kind == "orderedList" || block.kind == "unorderedList" {
         let mut children = Vec::new();
-        let items = children_by_edge(schema, &block.id, "items");
+        let mut items = children_by_edge(schema, &block.id, "items");
+        items.sort_by(|a, b| vertex_order_key(&a.1.id).cmp(&vertex_order_key(&b.1.id)));
         for (_edge, item) in &items {
             if item.kind != "listItem" {
                 continue;
             }
-            let item_children = children_by_edge(schema, &item.id, "items");
+            let mut item_children = children_by_edge(schema, &item.id, "items");
+            item_children.sort_by(|a, b| vertex_order_key(&a.1.id).cmp(&vertex_order_key(&b.1.id)));
             if let Some((_edge, nested)) = item_children.first() {
                 if let Ok(nested_json) = emit_block(schema, nested) {
                     let suffix = if block.kind == "orderedList" {
@@ -516,6 +520,18 @@ fn edge_rules() -> Vec<EdgeRule> {
             tgt_kinds: vec![],
         },
     ]
+}
+
+/// Extract a numeric ordering key from a vertex ID.
+///
+/// Vertex IDs are generated sequentially by the parsers (e.g.
+/// `page:0:block:0003`, `page:0:list:0004`).  Sorting by the last
+/// colon-separated numeric component restores source insertion order
+/// regardless of the type prefix (`block:`, `list:`, `item:`), which
+/// is necessary because upstream schema transforms may rebuild the
+/// edge HashMap and randomise iteration order.
+fn vertex_order_key(id: &str) -> u32 {
+    id.rsplit(':').next().and_then(|s| s.parse().ok()).unwrap_or(0)
 }
 
 #[cfg(test)]

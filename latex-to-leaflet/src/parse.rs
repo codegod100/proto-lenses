@@ -1,42 +1,41 @@
-//! LaTeX → Leaflet.pub document converter.
+//! LaTeX document parser.
 //!
-//! Parses `.tex` source with the tree-sitter LaTeX grammar and directly
-//! constructs a Leaflet [`Schema`] (using the `leaflet` protocol from
-//! [`leaflet_protocol`]).
+//! Parses `.tex` source with the tree-sitter LaTeX grammar and constructs a
+//! LaTeX [`Schema`] using the latex protocol.
 //!
 //! ## Supported constructs
 //!
-//! | LaTeX | Leaflet block |
-//! |-------|---------------|
-//! | `\title{…}` | `site.standard.document.title` |
-//! | `\section{…}` .. `\subparagraph{…}` | `pub.leaflet.blocks.header` |
-//! | plain text | `pub.leaflet.blocks.text` |
-//! | `\textbf{…}` / `\textit{…}` / `\texttt{…}` | `text` + facet constraints |
-//! | `\href{url}{text}` / `\url{…}` | `text` + `#link` facet |
-//! | `\cite{…}` | `text` + `#footnote` facet |
-//! | `quote` / `quotation` env | `pub.leaflet.blocks.blockquote` |
-//! | `itemize` env | `pub.leaflet.blocks.unorderedList` |
-//! | `enumerate` env | `pub.leaflet.blocks.orderedList` |
-//! | `\item` | `listItem` |
-//! | `verbatim` env | `pub.leaflet.blocks.code` (`language=verbatim`) |
-//! | `lstlisting` / `minted` env | `pub.leaflet.blocks.code` |
-//! | `$…$` / `\(…\)` | `pub.leaflet.blocks.math` |
-//! | `$$…$$` / `\[…\]` / `equation` env | `pub.leaflet.blocks.math` |
-//! | `\includegraphics{…}` | `pub.leaflet.blocks.image` |
-//! | unknown env | `pub.leaflet.blocks.blockquote` (fallback) |
+//! | LaTeX | Source vertex kind |
+//! |-------|-------------------|
+//! | `\title{…}` | `document` constraint |
+//! | `\section{…}` .. `\subparagraph{…}` | `section` |
+//! | plain text | `paragraph` |
+//! | `\textbf{…}` / `\textit{…}` / `\texttt{…}` | `paragraph` + facet constraints |
+//! | `\href{url}{text}` / `\url{…}` | `paragraph` + `#link` facet |
+//! | `\cite{…}` | `paragraph` + `#footnote` facet |
+//! | `quote` / `quotation` env | `quote` |
+//! | `itemize` env | `itemize` |
+//! | `enumerate` env | `enumerate` |
+//! | `\item` | `item` |
+//! | `verbatim` env | `verbatim` |
+//! | `lstlisting` / `minted` env | `code_listing` |
+//! | `$…$` / `\(…\)` | `equation` |
+//! | `$$…$$` / `\[…\]` / `equation` env | `equation` |
+//! | `\includegraphics{…}` | `image` |
+//! | unknown env | `blockquote` (fallback) |
 
 use panproto_schema::{Schema, SchemaBuilder};
 use tree_sitter::Node;
 
 use crate::LaTeXLeafletError;
 
-/// Convert LaTeX source bytes into a Leaflet document [`Schema`].
+/// Convert LaTeX source bytes into a LaTeX document [`Schema`].
 ///
 /// # Errors
 ///
 /// Returns [`LaTeXLeafletError`] if the LaTeX grammar is unavailable, tree-sitter
-/// fails to parse, or the resulting Leaflet schema is invalid.
-pub fn parse_latex_to_leaflet(source: &[u8], _file_path: &str) -> Result<Schema, LaTeXLeafletError> {
+/// fails to parse, or the resulting schema is invalid.
+pub fn parse_latex(source: &[u8], _file_path: &str) -> Result<Schema, LaTeXLeafletError> {
     let grammar = find_latex_grammar()?;
 
     let mut parser = tree_sitter::Parser::new();
@@ -50,7 +49,7 @@ pub fn parse_latex_to_leaflet(source: &[u8], _file_path: &str) -> Result<Schema,
             path: _file_path.to_owned(),
         })?;
 
-    let proto = leaflet_protocol::protocol();
+    let proto = crate::protocol::protocol();
     let builder = SchemaBuilder::new(&proto);
 
     let mut ctx = Context {
@@ -147,7 +146,7 @@ fn flush_pending_text(
     if trimmed.len() <= 2 && trimmed.chars().all(|c| c.is_ascii_punctuation()) {
         return Ok(builder);
     }
-    add_block(parent_id, "text", builder, ctx, |b, id| {
+    add_block(parent_id, "paragraph", builder, ctx, |b, id| {
         Ok(b.constraint(id, "plaintext", trimmed))
     })
 }
@@ -213,7 +212,7 @@ fn walk_node(
             builder = flush_pending_text(builder, parent_id, ctx)?;
             let mut builder = add_block(
                 parent_id,
-                "header",
+                "section",
                 builder,
                 ctx,
                 |b, id| {
@@ -253,7 +252,7 @@ fn walk_node(
             }
             let tex = node_text(node, ctx.source).trim().to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "math", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
         }
         "displayed_equation" => {
             if !ctx.in_body {
@@ -268,7 +267,7 @@ fn walk_node(
                 .trim()
                 .to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "math", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
         }
         "inline_formula" => {
             if !ctx.in_body {
@@ -283,7 +282,7 @@ fn walk_node(
                 .trim()
                 .to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "math", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
         }
         "verbatim_environment" => {
             if !ctx.in_body {
@@ -293,7 +292,7 @@ fn walk_node(
             builder = flush_pending_text(builder, parent_id, ctx)?;
             add_block(
                 parent_id,
-                "code",
+                "verbatim",
                 builder,
                 ctx,
                 |b, id| {
@@ -311,7 +310,7 @@ fn walk_node(
             builder = flush_pending_text(builder, parent_id, ctx)?;
             add_block(
                 parent_id,
-                "code",
+                "code_listing",
                 builder,
                 ctx,
                 |b, id| {
@@ -329,7 +328,7 @@ fn walk_node(
             builder = flush_pending_text(builder, parent_id, ctx)?;
             add_block(
                 parent_id,
-                "code",
+                "code_listing",
                 builder,
                 ctx,
                 |b, id| {
@@ -394,11 +393,11 @@ fn handle_environment(
     match env_name {
         "itemize" => {
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_list(parent_id, "unorderedList", node, doc_id, builder, ctx)
+            add_list(parent_id, "itemize", node, doc_id, builder, ctx)
         }
         "enumerate" => {
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_list(parent_id, "orderedList", node, doc_id, builder, ctx)
+            add_list(parent_id, "enumerate", node, doc_id, builder, ctx)
         }
         "quote" | "quotation" => {
             let content = flatten_children_text(node, ctx.source);
@@ -406,7 +405,7 @@ fn handle_environment(
                 builder = flush_pending_text(builder, parent_id, ctx)?;
                 add_block(
                     parent_id,
-                    "blockquote",
+                    "quote",
                     builder,
                     ctx,
                     |b, id| Ok(b.constraint(id, "plaintext", &content)),
@@ -421,7 +420,7 @@ fn handle_environment(
                 builder = flush_pending_text(builder, parent_id, ctx)?;
                 add_block(
                     parent_id,
-                    "code",
+                    "verbatim",
                     builder,
                     ctx,
                     |b, id| {
@@ -533,13 +532,13 @@ fn add_list(
     builder: SchemaBuilder,
     ctx: &mut Context,
 ) -> Result<SchemaBuilder, LaTeXLeafletError> {
-    let list_id = format!("{parent_id}:list:{}", ctx.block_counter);
+    let list_id = format!("{parent_id}:list:{:04}", ctx.block_counter);
     ctx.block_counter += 1;
 
     let mut builder = builder
         .vertex(&list_id, list_kind, None)
         .map_err(|e| LaTeXLeafletError::SchemaConstruction { reason: e.to_string() })?;
-    if list_kind == "orderedList" {
+    if list_kind == "enumerate" {
         builder = builder.constraint(&list_id, "startIndex", "1");
     }
     builder = builder
@@ -548,11 +547,11 @@ fn add_list(
 
     for child in node.children(&mut node.walk()) {
         if child.kind() == "enum_item" || child.kind() == "item" {
-            let item_id = format!("{list_id}:item:{}", ctx.block_counter);
+            let item_id = format!("{list_id}:item:{:04}", ctx.block_counter);
             ctx.block_counter += 1;
 
             builder = builder
-                .vertex(&item_id, "listItem", None)
+                .vertex(&item_id, "item", None)
                 .map_err(|e| LaTeXLeafletError::SchemaConstruction { reason: e.to_string() })?;
             builder = builder
                 .edge(&list_id, &item_id, "items", None)
@@ -580,7 +579,7 @@ fn add_block<F>(
 where
     F: FnOnce(SchemaBuilder, &str) -> Result<SchemaBuilder, LaTeXLeafletError>,
 {
-    let id = format!("{parent_id}:block:{}", ctx.block_counter);
+    let id = format!("{parent_id}:block:{:04}", ctx.block_counter);
     ctx.block_counter += 1;
 
     let builder = builder

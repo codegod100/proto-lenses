@@ -1,15 +1,17 @@
 //! Markdown → Leaflet.pub protolens.
 //!
 //! This crate converts CommonMark / GitHub Flavored Markdown into Leaflet
-//! document schemas, mirroring the architecture of `latex-to-leaflet`.
+//! document schemas via a declarative lens DSL spec.
 
 pub mod parse;
+pub mod protocol;
 pub mod unicode;
 
-pub use parse::parse_markdown_to_leaflet;
+pub use parse::parse_markdown;
 pub use unicode::latex_to_unicode;
 
 use panproto_schema::Schema;
+use std::sync::LazyLock;
 
 /// Errors from Markdown → Leaflet conversion.
 #[derive(Debug, thiserror::Error)]
@@ -28,6 +30,10 @@ pub enum MarkdownLeafletError {
         path: String,
     },
 
+    /// A lens DSL operation failed.
+    #[error("lens DSL error: {0}")]
+    LensDsl(#[from] panproto_lens_dsl::LensDslError),
+
     /// A lens-related operation failed.
     #[error("lens error: {0}")]
     Lens(#[from] panproto_lens::LensError),
@@ -38,38 +44,33 @@ pub fn markdown_to_leaflet_schema(
     source: &[u8],
     file_path: &str,
 ) -> Result<Schema, MarkdownLeafletError> {
-    parse_markdown_to_leaflet(source, file_path)
+    let md_schema = parse_markdown(source, file_path)?;
+    let chain = markdown_to_leaflet_chain()?;
+    let proto = protocol::protocol();
+    let lens = chain.instantiate(&md_schema, &proto)?;
+    Ok(lens.tgt_schema)
 }
 
-/// Return a [`ProtolensChain`] that converts Markdown → Leaflet.
-pub fn markdown_to_leaflet_chain() -> Result<panproto_lens::ProtolensChain, MarkdownLeafletError> {
-    Ok(panproto_lens::ProtolensChain::new(vec![]))
-}
+/// Load and compile the Markdown → Leaflet lens spec.
+///
+/// The spec is embedded at compile time from `theories/markdown_to_leaflet.ncl`.
+fn markdown_to_leaflet_chain()
+    -> Result<&'static panproto_lens::ProtolensChain, MarkdownLeafletError>
+{
+    static CHAIN: LazyLock<Result<panproto_lens::ProtolensChain, String>> = LazyLock::new(|| {
+        let source = include_str!("../theories/markdown_to_leaflet.ncl");
+        panproto_lens_dsl::eval::eval_nickel(source, &[])
+            .and_then(|doc| panproto_lens_dsl::compile(&doc, "document", &|_| None))
+            .map(|c| c.chain)
+            .map_err(|e| e.to_string())
+    });
 
-/// Build an identity [`Lens`] from a parsed Markdown schema.
-pub fn markdown_to_leaflet_identity_lens(
-    schema: &Schema,
-) -> Result<panproto_lens::Lens, MarkdownLeafletError> {
-    let surviving_verts = schema.vertices.keys().cloned().collect();
-    let surviving_edges = schema.edges.keys().cloned().collect();
-
-    let compiled = panproto_inst::CompiledMigration {
-        surviving_verts,
-        surviving_edges,
-        vertex_remap: std::collections::HashMap::new(),
-        edge_remap: std::collections::HashMap::new(),
-        resolver: std::collections::HashMap::new(),
-        hyper_resolver: std::collections::HashMap::new(),
-        field_transforms: std::collections::HashMap::new(),
-        conditional_survival: std::collections::HashMap::new(),
-        expansion_path: std::collections::HashMap::new(),
-    };
-
-    Ok(panproto_lens::Lens {
-        compiled,
-        src_schema: schema.clone(),
-        tgt_schema: schema.clone(),
-    })
+    match &*CHAIN {
+        Ok(chain) => Ok(chain),
+        Err(e) => Err(MarkdownLeafletError::SchemaConstruction {
+            reason: e.clone(),
+        }),
+    }
 }
 
 #[cfg(test)]

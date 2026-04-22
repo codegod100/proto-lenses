@@ -17,6 +17,8 @@ leaflet-protocol = { workspace = true }
 panproto-schema = { workspace = true }
 panproto-inst = { workspace = true }
 panproto-lens = { workspace = true }
+panproto-lens-dsl = { workspace = true }
+panproto-protocols = { workspace = true }
 tree-sitter = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

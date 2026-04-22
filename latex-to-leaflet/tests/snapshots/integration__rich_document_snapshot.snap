@@ -1,5 +1,5 @@
 ---
-source: latex/tests/integration.rs
+source: latex-to-leaflet/tests/integration.rs
 assertion_line: 37
 expression: json
 ---

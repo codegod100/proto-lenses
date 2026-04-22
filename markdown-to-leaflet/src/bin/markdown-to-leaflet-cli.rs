@@ -9,7 +9,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    let schema = match markdown_to_leaflet::parse_markdown_to_leaflet(&input, "<stdin>") {
+    let schema = match markdown_to_leaflet::markdown_to_leaflet_schema(&input, "<stdin>") {
         Ok(s) => s,
         Err(e) => {
             eprintln!("Conversion error: {e}");

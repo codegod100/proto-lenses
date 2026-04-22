@@ -1,10 +1,10 @@
 use latex_to_leaflet::{
-    latex_to_leaflet_schema, parse_latex_to_leaflet, LaTeXToLeafletConfig,
+    latex_to_leaflet_schema, LaTeXToLeafletConfig,
 };
 
 /// Convert LaTeX source into a JSON [`Value`] using the default config.
 pub fn convert(tex: &str) -> serde_json::Value {
-    let schema = parse_latex_to_leaflet(tex.as_bytes(), "test.tex").unwrap();
+    let schema = latex_to_leaflet_schema(tex.as_bytes(), "test.tex").unwrap();
     leaflet_protocol::emit_leaflet_document(&schema).unwrap()
 }
 
