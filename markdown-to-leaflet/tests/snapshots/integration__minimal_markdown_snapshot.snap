@@ -1,0 +1,26 @@
+---
+source: markdown/tests/integration.rs
+assertion_line: 9
+expression: json
+---
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Hello world."
+            }
+          }
+        ],
+        "id": "page:0"
+      }
+    ]
+  }
+}

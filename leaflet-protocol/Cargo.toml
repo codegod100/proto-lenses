@@ -1,0 +1,21 @@
+[package]
+name = "leaflet-protocol"
+description = "Leaflet.pub document protocol definition"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+panproto-gat = { workspace = true }
+panproto-schema = { workspace = true }
+panproto-protocols = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+
+[lints]
+workspace = true

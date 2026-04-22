@@ -1,0 +1,80 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{An Illustrated Guide to \LaTeX}
+\author{Jane Doe}
+\date{2026-04-21}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is a sample document demonstrating the \texttt{latex-to-leaflet} converter.
+Every major construct supported by the parser appears at least once.
+\end{abstract}
+
+\section{Introduction}
+
+Welcome to the guide. Inline math works: $E = mc^2$.
+Display math is also supported:
+
+\begin{equation}
+    \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+    \label{eq:gaussian}
+\end{equation}
+
+\section{Lists}
+
+\subsection{Bullet list}
+
+\begin{itemize}
+    \item First item with \textbf{bold} text.
+    \item Second item with \textit{italic} text.
+    \item Third item containing inline math: $\alpha + \beta = \gamma$.
+\end{itemize}
+
+\subsection{Numbered list}
+
+\begin{enumerate}
+    \item Step one: open the document.
+    \item Step two: write your content.
+    \item Step three: compile and publish.
+\end{enumerate}
+
+\section{Code}
+
+\begin{verbatim}
+fn main() {
+    println!("Hello from Rust!");
+}
+\end{verbatim}
+
+\section{Figures}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{diagram.png}
+    \caption{A sample diagram illustrating the conversion pipeline.}
+    \label{fig:pipeline}
+\end{figure}
+
+\section{Quotation}
+
+\begin{quote}
+    "The best way to predict the future is to invent it." --- Alan Kay
+\end{quote}
+
+\section{Custom Environment Fallback}
+
+\begin{myenv}
+This environment is not recognized by the parser, so it falls back
+ to a \texttt{blockquote} block.
+\end{myenv}
+
+\section{Conclusion}
+
+That covers the basics. Happy writing!
+
+\end{document}

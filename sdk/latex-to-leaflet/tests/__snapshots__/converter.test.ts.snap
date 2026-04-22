@@ -1,0 +1,750 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`convertLatex > matches snapshot for category.latex 1`] = `
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Introduction",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Category theory serves as the structural foundation of modern mathematics. By abstracting away the internal elements of objects and focusing on the \\textit{morphisms} (arrows) between them, it reveals deep structural commonalities between disparate fields such as algebraic geometry, theoretical computer science, and mathematical logic. This document synthesizes core definitions, the fundamental Yoneda Lemma, and interdisciplinary applications.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "1. Fundamental Definitions",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "1.1 Categories",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "A \\textbf{category}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "consists of:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "A collection of \\textbf{objects}",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "For every pair of objects",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "A \\textbf{composition} law: for any",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Identity: For every object",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Axioms:",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "1.2 Functors",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "A \\textbf{functor}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "F: \\mathcal{C} \\to \\mathcal{D}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "is a mapping that preserves the categorical structure:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Object assignment:",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Morphism assignment:",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Functoriality:",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "1.3 Natural Transformations",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "A \\textbf{natural transformation}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\alpha: F \\Rightarrow G",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "between functors",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "F, G: \\mathcal{C} \\to \\mathcal{D}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "is a family of morphisms",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\alpha_X: F(X) \\to G(X)",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "in",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{D}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "such that for any",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "f: X \\to Y",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "in",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": ", the following diagram commutes:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "2. Core Theorems and Constructions",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "2.1 The Yoneda Lemma",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "The Yoneda Lemma is the cornerstone of the representation theory of categories. It states that the structure of an object is completely determined by its relationship to all other objects in the category.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.blockquote",
+              "plaintext": "For any object $A \\in \\mathcal{C}$ and any functor $F: \\mathcal{C}^{op} \\to \\text{Set}$, there is a natural isomorphism: \\[
+\\text{Nat}(\\text{Hom}_{\\mathcal{C}}(-, A), F) \\cong F(A)
+\\] given by the mapping $\\alpha \\mapsto \\alpha_A(1_A)$.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "The \\textbf{Yoneda embedding}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{Y}: \\mathcal{C} \\to \\text{Set}^{\\mathcal{C}^{op}}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "sends",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "A",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "to the representable presheaf",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "h_A = \\text{Hom}(-, A)",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": ". This embedding is \\textit{fully faithful}, meaning",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\text{Hom}_{\\mathcal{C}}(A, B) \\cong \\text{Nat}(h_A, h_B)",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "2.2 Adjunctions",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "An \\textbf{adjunction}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "L \\dashv R",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "between categories",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "and",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{D}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "consists of a pair of functors",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "L: \\mathcal{C} \\to \\mathcal{D}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "and",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "R: \\mathcal{D} \\to \\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "and a natural isomorphism:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\varphi_{X,Y}: \\text{Hom}_{\\mathcal{D}}(L(X), Y) \\xrightarrow{\\cong} \\text{Hom}_{\\mathcal{C}}(X, R(Y))",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "The functor",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "L",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "is the \\textit{left adjoint} and",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "R",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "is the \\textit{right adjoint}. Adjunctions are ubiquitous as they characterize "optimal" or "free" constructions.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "2.3 Monads",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "A \\textbf{monad} on a category",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "is an endofunctor",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "T: \\mathcal{C} \\to \\mathcal{C}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "equipped with two natural transformations:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Unit",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Multiplication",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "These must satisfy the coherence conditions for associativity (",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mu \\circ T\\mu = \\mu \\circ \\mu T",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": ") and unit (",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\mu \\circ T\\eta = 1_T = \\mu \\circ \\eta T",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "). Every adjunction",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "L \\dashv R",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "defines a monad",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "T = R \\circ L",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "3. Interdisciplinary Applications",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "3.1 The Curry-Howard-Lambek Correspondence",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "This correspondence establishes a deep isomorphism between three distinct fields:",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 3,
+              "plaintext": "3.2 Topos Theory",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "A \\textbf{Topos} is a category that possesses enough structure to interpret higher-order logic. Specifically, an elementary topos has finite limits, exponentials, and a \\textit{subobject classifier}",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\Omega",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": ". This allows for the "internalization" of set-theoretic operations within geometry.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "4. Historical Context",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Category theory was introduced by \\textbf{Samuel Eilenberg} and \\textbf{Saunders Mac Lane} in 1945 to provide a formal definition of "naturality" in algebraic topology. The field was revolutionized in the 1960s by \\textbf{Alexander Grothendieck}, who applied categorical methods to algebraic geometry through the theory of schemes and sheaves.",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Selected Bibliography",
+            },
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Mac Lane, S. (1971). \\textit{Categories for the Working Mathematician}. Graduate Texts in Mathematics.",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Fong, B., Spivak, D. I. (2019). \\textit{Seven Sketches in Compositionality}. Cambridge University Press.",
+                    },
+                  },
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Barr, M., Wells, C. (1990). \\textit{Category Theory for Computing Science}. Prentice Hall.",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        "id": "page:0",
+      },
+    ],
+  },
+  "title": "Category Theory: Foundations and Applications",
+}
+`;

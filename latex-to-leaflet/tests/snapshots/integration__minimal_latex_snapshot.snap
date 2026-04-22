@@ -1,0 +1,26 @@
+---
+source: latex/tests/integration.rs
+assertion_line: 16
+expression: json
+---
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Hello."
+            }
+          }
+        ],
+        "id": "page:0"
+      }
+    ]
+  }
+}

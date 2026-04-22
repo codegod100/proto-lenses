@@ -1,0 +1,29 @@
+[package]
+name = "markdown-to-leaflet"
+description = "Markdown -> Leaflet.pub document converter"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "markdown-to-leaflet-cli"
+path = "src/bin/markdown-to-leaflet-cli.rs"
+
+[dependencies]
+leaflet-protocol = { workspace = true }
+panproto-schema = { workspace = true }
+panproto-inst = { workspace = true }
+panproto-lens = { workspace = true }
+pulldown-cmark = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true, features = ["json"] }
+pretty_assertions = { workspace = true }
+
+[lints]
+workspace = true
