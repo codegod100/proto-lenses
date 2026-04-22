@@ -1,6 +1,7 @@
-import { n as __toESM, t as require___vite_browser_external } from "./__vite-browser-external-DYYTRqse.js";
+import { spawn } from "node:child_process";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 //#region src/types.ts
-var import___vite_browser_external = require___vite_browser_external();
 /** Error raised when the converter binary cannot be found or the conversion fails. */
 var MarkdownConversionError = class extends Error {
 	constructor(message, cause) {
@@ -18,13 +19,13 @@ var MarkdownConversionError = class extends Error {
 * stdin, and parses the emitted Leaflet JSON from stdout.
 */
 /** Resolved paths relative to the package root. */
-var PKG_ROOT = (0, import___vite_browser_external.resolve)((0, import___vite_browser_external.fileURLToPath)(import.meta.url), "../..");
-var RELEASE_BINARY = (0, import___vite_browser_external.resolve)(PKG_ROOT, "../../..", "target/release/markdown-to-leaflet-cli");
-var DEBUG_BINARY = (0, import___vite_browser_external.resolve)(PKG_ROOT, "../../..", "target/debug/markdown-to-leaflet-cli");
+var PKG_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
+var RELEASE_BINARY = resolve(PKG_ROOT, "../../..", "target/release/markdown-to-leaflet-cli");
+var DEBUG_BINARY = resolve(PKG_ROOT, "../../..", "target/debug/markdown-to-leaflet-cli");
 async function discoverBinary(preferred) {
 	if (preferred) return preferred;
 	for (const candidate of [RELEASE_BINARY, DEBUG_BINARY]) try {
-		const { access } = await import("./__vite-browser-external-DYYTRqse.js").then((n) => /* @__PURE__ */ __toESM(n.t(), 1));
+		const { access } = await import("node:fs/promises");
 		await access(candidate);
 		return candidate;
 	} catch {}
@@ -41,7 +42,7 @@ async function discoverBinary(preferred) {
 async function convertMarkdown(source, options) {
 	const binary = await discoverBinary(options?.binaryPath);
 	return new Promise((resolve, reject) => {
-		const child = (0, import___vite_browser_external.spawn)(binary, { stdio: [
+		const child = spawn(binary, { stdio: [
 			"pipe",
 			"pipe",
 			"pipe"

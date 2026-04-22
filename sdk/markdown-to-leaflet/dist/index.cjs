@@ -1,7 +1,8 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require___vite_browser_external$1 = require("./__vite-browser-external-CQXcjybA.cjs");
+let node_child_process = require("node:child_process");
+let node_path = require("node:path");
+let node_url = require("node:url");
 //#region src/types.ts
-var import___vite_browser_external = require___vite_browser_external$1.require___vite_browser_external();
 /** Error raised when the converter binary cannot be found or the conversion fails. */
 var MarkdownConversionError = class extends Error {
 	constructor(message, cause) {
@@ -19,13 +20,13 @@ var MarkdownConversionError = class extends Error {
 * stdin, and parses the emitted Leaflet JSON from stdout.
 */
 /** Resolved paths relative to the package root. */
-var PKG_ROOT = (0, import___vite_browser_external.resolve)((0, import___vite_browser_external.fileURLToPath)({}.url), "../..");
-var RELEASE_BINARY = (0, import___vite_browser_external.resolve)(PKG_ROOT, "../../..", "target/release/markdown-to-leaflet-cli");
-var DEBUG_BINARY = (0, import___vite_browser_external.resolve)(PKG_ROOT, "../../..", "target/debug/markdown-to-leaflet-cli");
+var PKG_ROOT = (0, node_path.resolve)((0, node_url.fileURLToPath)({}.url), "../..");
+var RELEASE_BINARY = (0, node_path.resolve)(PKG_ROOT, "../../..", "target/release/markdown-to-leaflet-cli");
+var DEBUG_BINARY = (0, node_path.resolve)(PKG_ROOT, "../../..", "target/debug/markdown-to-leaflet-cli");
 async function discoverBinary(preferred) {
 	if (preferred) return preferred;
 	for (const candidate of [RELEASE_BINARY, DEBUG_BINARY]) try {
-		const { access } = await Promise.resolve().then(() => require("./__vite-browser-external-CQXcjybA.cjs")).then((n) => /* @__PURE__ */ require___vite_browser_external$1.__toESM(n.require___vite_browser_external(), 1));
+		const { access } = await import("node:fs/promises");
 		await access(candidate);
 		return candidate;
 	} catch {}
@@ -42,7 +43,7 @@ async function discoverBinary(preferred) {
 async function convertMarkdown(source, options) {
 	const binary = await discoverBinary(options?.binaryPath);
 	return new Promise((resolve, reject) => {
-		const child = (0, import___vite_browser_external.spawn)(binary, { stdio: [
+		const child = (0, node_child_process.spawn)(binary, { stdio: [
 			"pipe",
 			"pipe",
 			"pipe"

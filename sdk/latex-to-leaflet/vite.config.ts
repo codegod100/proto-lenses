@@ -14,6 +14,15 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: true,
     minify: false,
+    rollupOptions: {
+      external: [
+        'node:child_process',
+        'node:path',
+        'node:url',
+        'node:fs/promises',
+        'node:fs',
+      ],
+    },
   },
   test: {
     globals: true,

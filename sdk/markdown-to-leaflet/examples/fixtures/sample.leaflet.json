@@ -1,0 +1,154 @@
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 1,
+              "plaintext": "Introduction"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "This is a rich Markdown document with formatting, inline code, and math: E=mc²."
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Lists"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "First unordered item"
+                    }
+                  }
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Second unordered item"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.orderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.orderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "First ordered item"
+                    }
+                  }
+                },
+                {
+                  "$type": "pub.leaflet.blocks.orderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Second ordered item"
+                    }
+                  }
+                }
+              ],
+              "startIndex": 1
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Code"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.code",
+              "language": "python",
+              "plaintext": "def hello():\n    return \"world\""
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Blockquote"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.blockquote",
+              "plaintext": "A famous quote. Spread across lines."
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.horizontalRule"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.image",
+              "src": "/images/diagram.png",
+              "title": "Diagram"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Display Math"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\int_0^1 x \\, dx = \\frac{1}{2}"
+            }
+          }
+        ],
+        "id": "page:0"
+      }
+    ]
+  }
+}
