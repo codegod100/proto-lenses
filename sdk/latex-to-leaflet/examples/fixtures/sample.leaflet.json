@@ -1,0 +1,123 @@
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.header",
+              "level": 2,
+              "plaintext": "Introduction"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Some \\textbf{bold} and \\textit{italic} text with"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "x^2"
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "math."
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.unorderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "First item"
+                    }
+                  }
+                },
+                {
+                  "$type": "pub.leaflet.blocks.unorderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Second item"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.orderedList",
+              "children": [
+                {
+                  "$type": "pub.leaflet.blocks.orderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "First ordered"
+                    }
+                  }
+                },
+                {
+                  "$type": "pub.leaflet.blocks.orderedList#listItem",
+                  "content": {
+                    "$type": "pub.leaflet.pages.linearDocument#block",
+                    "block": {
+                      "$type": "pub.leaflet.blocks.text",
+                      "plaintext": "Second ordered"
+                    }
+                  }
+                }
+              ],
+              "startIndex": 1
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.code",
+              "language": "verbatim",
+              "plaintext": "def hello():\n    return \"world\""
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.blockquote",
+              "plaintext": "A famous quote."
+            }
+          },
+          {
+            "$type": "pub.leaflet.pages.linearDocument#block",
+            "block": {
+              "$type": "pub.leaflet.blocks.math",
+              "tex": "\\int_0^1 x \\, dx = \\frac{1}{2}"
+            }
+          }
+        ],
+        "id": "page:0"
+      }
+    ]
+  },
+  "title": "Sample Document"
+}

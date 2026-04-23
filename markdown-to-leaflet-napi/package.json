@@ -1,0 +1,8 @@
+{
+  "name": "markdown-to-leaflet",
+  "version": "0.30.0",
+  "napi": {
+    "name": "markdown-to-leaflet",
+    "triples": {}
+  }
+}

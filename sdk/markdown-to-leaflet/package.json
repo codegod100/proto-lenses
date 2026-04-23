@@ -3,38 +3,27 @@
   "version": "0.30.0",
   "description": "TypeScript SDK for the markdown-to-leaflet converter",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    }
-  },
+  "main": "index.js",
+  "types": "index.d.ts",
   "files": [
+    "index.js",
+    "index.d.ts",
     "dist",
+    "binding",
     "README.md"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "napi build --platform --release ../../../markdown-to-leaflet-napi && tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint ."
   },
   "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
     "@types/node": "^25.6.0",
     "oxlint": "^1.60.0",
     "typescript": "^6.0.2",
-    "vite": "^8.0.8",
-    "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.4"
   },
   "engines": {

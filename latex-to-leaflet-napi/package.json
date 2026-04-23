@@ -1,0 +1,8 @@
+{
+  "name": "latex-to-leaflet",
+  "version": "0.30.0",
+  "napi": {
+    "name": "latex-to-leaflet",
+    "triples": {}
+  }
+}

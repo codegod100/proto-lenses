@@ -1,0 +1,9 @@
+{
+  "name": "latex-to-leaflet",
+  "targets": [
+    "x86_64-unknown-linux-gnu"
+  ],
+  "triples": {
+    "x86_64-unknown-linux-gnu": {}
+  }
+}

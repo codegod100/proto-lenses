@@ -2,6 +2,8 @@
 
 TypeScript SDK for the Markdown → Leaflet.pub converter.
 
+Powered by a native Node.js addon (napi-rs) — no external binaries required.
+
 ## Install
 
 ```bash
@@ -23,19 +25,6 @@ This is **bold** and *italic*.
 `);
 
 console.log(doc.content.pages[0].blocks);
-```
-
-The SDK discovers the `markdown-to-leaflet-cli` binary automatically by searching:
-1. `../../target/release/markdown-to-leaflet-cli`
-2. `../../target/debug/markdown-to-leaflet-cli`
-3. `markdown-to-leaflet-cli` on `$PATH`
-
-You can also pass an explicit path:
-
-```typescript
-const doc = await convertMarkdown(source, {
-  binaryPath: '/path/to/markdown-to-leaflet-cli',
-});
 ```
 
 ## Error handling

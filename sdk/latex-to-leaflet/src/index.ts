@@ -3,4 +3,4 @@
  */
 
 export { convertLatex } from './converter.js';
-export { LatexConversionError, type ConvertOptions, type LeafletDocument } from './types.js';
+export { LatexConversionError, type LeafletDocument } from './types.js';

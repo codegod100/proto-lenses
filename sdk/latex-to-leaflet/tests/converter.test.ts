@@ -1,21 +1,11 @@
 /**
- * Integration tests for the @panproto/latex-to-leaflet converter.
+ * Integration tests for the @nandithebull/latex-to-leaflet converter.
  *
- * These tests require the `latex-to-leaflet-cli` binary to be built.
- * Run from workspace root:
- *   cargo build -p latex-to-leaflet --release
- *   pnpm test
+ * These tests use the native napi-rs addon, not a CLI binary.
  */
 
 import { describe, it, expect } from 'vitest';
 import { convertLatex, LatexConversionError } from '../src/index.js';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
-const BINARY_PATH = resolve(
-  import.meta.dirname,
-  '../../../target/release/latex-to-leaflet-cli',
-);
 
 describe('convertLatex', () => {
   it('converts minimal LaTeX', async () => {
@@ -24,7 +14,6 @@ describe('convertLatex', () => {
       '\\begin{document}\n' +
       'Hello world.\n' +
       '\\end{document}',
-      { binaryPath: BINARY_PATH },
     );
     expect(json.$type).toBe('site.standard.document');
     expect(json.content).toBeDefined();
@@ -40,7 +29,6 @@ describe('convertLatex', () => {
       '\\maketitle\n' +
       'Body text.\n' +
       '\\end{document}',
-      { binaryPath: BINARY_PATH },
     );
     expect(json.title).toBe('My Document');
   });
@@ -54,7 +42,6 @@ describe('convertLatex', () => {
       '\\begin{document}\n' +
       'Clean body.\n' +
       '\\end{document}',
-      { binaryPath: BINARY_PATH },
     );
     const blocks = json.content.pages[0].blocks;
     const allText = blocks
@@ -72,7 +59,6 @@ describe('convertLatex', () => {
       '\\begin{document}\n' +
       '$x^2 + y^2 = z^2$\n' +
       '\\end{document}',
-      { binaryPath: BINARY_PATH },
     );
     const blocks = json.content.pages[0].blocks;
     const mathBlocks = blocks.filter(
@@ -91,7 +77,6 @@ describe('convertLatex', () => {
       '\\item Second\n' +
       '\\end{itemize}\n' +
       '\\end{document}',
-      { binaryPath: BINARY_PATH },
     );
     const blocks = json.content.pages[0].blocks;
     const lists = blocks.filter(
@@ -102,33 +87,49 @@ describe('convertLatex', () => {
     expect(children.length).toBe(2);
   });
 
-  it('throws LatexConversionError for invalid binary path', async () => {
-    await expect(
-      convertLatex('\\begin{document}\\end{document}', {
-        binaryPath: '/nonexistent/binary',
-      }),
-    ).rejects.toBeInstanceOf(LatexConversionError);
-  });
-
   it('throws LatexConversionError for malformed LaTeX caught by Rust', async () => {
     // This test is intentionally vague because tree-sitter is permissive.
     // Instead of asserting a specific failure, just assert it doesn't crash
     // the process and returns *something* parseable (even if empty).
-    const json = await convertLatex('this is not latex at all', {
-      binaryPath: BINARY_PATH,
-    });
+    const json = await convertLatex('this is not latex at all');
     expect(json.$type).toBe('site.standard.document');
   });
 
-  /**
-   * Full regression test on the canonical example.
-   */
   it('matches snapshot for category.latex', async () => {
-    const source = readFileSync(
-      resolve(import.meta.dirname, '../../../latex/examples/category.latex'),
-      'utf8',
-    );
-    const json = await convertLatex(source, { binaryPath: BINARY_PATH });
+    const source = `
+\\documentclass{article}
+\\title{Category Theory: Foundations and Applications}
+\\author{Emily Riehl}
+\\date{\\today}
+
+\\begin{document}
+\\maketitle
+
+\\begin{abstract}
+This is a concise introduction to category theory.
+\\end{abstract}
+
+\\section{Introduction}
+
+Category theory provides a framework for studying structures.
+
+\\begin{itemize}
+\\item Objects
+\\item Morphisms
+\\item Composition
+\\end{itemize}
+
+\\[
+  f : A \\to B
+\\]
+
+\\begin{quote}
+  "A category is a quiver with a composition law."
+\\end{quote}
+
+\\end{document}
+`;
+    const json = await convertLatex(source);
     expect(json.title).toBe('Category Theory: Foundations and Applications');
     const blocks = json.content.pages[0].blocks;
     const blockTypes = blocks.map((b) => b.block.$type);

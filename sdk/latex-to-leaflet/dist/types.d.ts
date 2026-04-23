@@ -1,43 +1,31 @@
 /**
- * Core types for the LaTeX → Leaflet converter.
+ * Shared types for the @nandithebull/latex-to-leaflet SDK.
  */
-/** A single block inside a Leaflet page. */
-export interface LeafletBlock {
-    $type: string;
-    block: Record<string, unknown> & {
-        $type: string;
-    };
-}
-/** A Leaflet page. */
-export interface LeafletPage {
-    $type: string;
-    blocks: LeafletBlock[];
-    id: string;
-}
-/** The emitted Leaflet document. */
+/**
+ * A Leaflet document returned by the converter.
+ */
 export interface LeafletDocument {
     $type: 'site.standard.document';
     title?: string;
+    description?: string;
     content: {
         $type: 'pub.leaflet.content';
-        pages: LeafletPage[];
+        pages: Array<{
+            $type: 'pub.leaflet.pages.linearDocument';
+            id: string;
+            blocks: Array<{
+                $type: 'pub.leaflet.pages.linearDocument#block';
+                block: Record<string, unknown>;
+            }>;
+        }>;
     };
 }
-/** Options for {@link convertLatex}. */
-export interface ConvertOptions {
-    /**
-     * Path to the `latex-to-leaflet-cli` binary.
-     *
-     * If omitted the SDK searches:
-     * 1. `../../target/release/latex-to-leaflet-cli`
-     * 2. `../../target/debug/latex-to-leaflet-cli`
-     * 3. `latex-to-leaflet-cli` on `$PATH`
-     */
-    binaryPath?: string;
-}
-/** Error raised when the converter binary cannot be found or the conversion fails. */
+/** Error raised when the converter addon cannot be found or the conversion fails. */
 export declare class LatexConversionError extends Error {
+    /** Original error, if any. */
     readonly cause?: Error | undefined;
-    constructor(message: string, cause?: Error | undefined);
+    constructor(message: string, 
+    /** Original error, if any. */
+    cause?: Error | undefined);
 }
 //# sourceMappingURL=types.d.ts.map
