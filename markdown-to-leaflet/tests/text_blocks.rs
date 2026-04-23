@@ -146,3 +146,19 @@ fn inline_math_mixed_with_formatting() {
     assert_eq!(bs.len(), 1);
     assert_eq!(plaintext(&bs[0]), "This is bold and x² math.");
 }
+
+#[test]
+fn wikilink_plain_text() {
+    let json = convert("See [[Category Theory]] for more.");
+    let bs = blocks(&json);
+    assert_eq!(bs.len(), 1);
+    assert_eq!(plaintext(&bs[0]), "See Category Theory for more.");
+}
+
+#[test]
+fn wikilink_with_display_text() {
+    let json = convert("Read [[math#algebra|Algebra]] now.");
+    let bs = blocks(&json);
+    assert_eq!(bs.len(), 1);
+    assert_eq!(plaintext(&bs[0]), "Read Algebra now.");
+}

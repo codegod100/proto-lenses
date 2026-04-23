@@ -39,6 +39,8 @@ pub fn parse_markdown(
 
     let mut opts = pulldown_cmark::Options::empty();
     opts.insert(pulldown_cmark::Options::ENABLE_MATH);
+    opts.insert(pulldown_cmark::Options::ENABLE_TABLES);
+    opts.insert(pulldown_cmark::Options::ENABLE_WIKILINKS);
     let parser = pulldown_cmark::Parser::new_ext(text, opts);
     let walker = EventWalker {
         page_id: page_id.to_string(),
@@ -46,6 +48,7 @@ pub fn parse_markdown(
         stack: Vec::new(),
         link_url: None,
         pending_code_lang: None,
+        table_state: None,
     };
     builder = walker.walk(parser, builder, &mut ctx)?;
 
@@ -197,6 +200,122 @@ fn err_schema(e: panproto_schema::SchemaError) -> MarkdownLeafletError {
     }
 }
 
+/// Escape plain-text characters that are special in LaTeX math mode.
+fn escape_latex(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            '\\' => "\\\\".to_string(),
+            '{' => "\\{".to_string(),
+            '}' => "\\}".to_string(),
+            '$' => "\\$".to_string(),
+            '&' => "\\&".to_string(),
+            '#' => "\\#".to_string(),
+            '%' => "\\%".to_string(),
+            '_' => "\\_".to_string(),
+            '^' => "\\^".to_string(),
+            '~' => "\\textasciitilde{}".to_string(),
+            _ => c.to_string(),
+        })
+        .collect()
+}
+
+/// One segment of a table cell's LaTeX representation.
+enum CellSegment {
+    Text(String),
+    Math(String),
+}
+
+/// Accumulates inline content for a single table cell.
+struct CellAccumulator {
+    segments: Vec<CellSegment>,
+    pending_text: String,
+}
+
+impl CellAccumulator {
+    fn new() -> Self {
+        Self {
+            segments: Vec::new(),
+            pending_text: String::new(),
+        }
+    }
+
+    fn push_text(&mut self, text: &str) {
+        self.pending_text.push_str(text);
+    }
+
+    fn push_space(&mut self) {
+        if !self.pending_text.ends_with(' ') {
+            self.pending_text.push(' ');
+        }
+    }
+
+    fn push_math(&mut self, tex: &str) {
+        self.flush_text();
+        self.segments.push(CellSegment::Math(tex.to_string()));
+    }
+
+    fn flush_text(&mut self) {
+        if !self.pending_text.is_empty() {
+            self.segments
+                .push(CellSegment::Text(std::mem::take(&mut self.pending_text)));
+        }
+    }
+
+    fn build(mut self) -> String {
+        self.flush_text();
+        self.segments
+            .iter()
+            .map(|s| match s {
+                CellSegment::Text(t) => format!(r"\text{{{}}}", escape_latex(t)),
+                CellSegment::Math(m) => m.clone(),
+            })
+            .collect()
+    }
+}
+
+/// State collected while walking a Markdown table.
+struct TableState {
+    alignments: Vec<pulldown_cmark::Alignment>,
+    rows: Vec<Vec<String>>,
+    cur_row: Vec<String>,
+    cur_cell: CellAccumulator,
+}
+
+impl TableState {
+    fn new(alignments: Vec<pulldown_cmark::Alignment>) -> Self {
+        Self {
+            alignments,
+            rows: Vec::new(),
+            cur_row: Vec::new(),
+            cur_cell: CellAccumulator::new(),
+        }
+    }
+
+    fn build_latex(self) -> String {
+        let cols = self
+            .alignments
+            .iter()
+            .map(|a| match a {
+                pulldown_cmark::Alignment::Left | pulldown_cmark::Alignment::None => "l",
+                pulldown_cmark::Alignment::Center => "c",
+                pulldown_cmark::Alignment::Right => "r",
+            })
+            .collect::<String>();
+
+        let mut lines = vec![format!(r"\begin{{array}}{{{}}}", cols)];
+        lines.push(r"  \hline".to_string());
+
+        for row in self.rows {
+            let row_content = row.join(" & ");
+            lines.push(format!("  {} \\\\", row_content));
+            lines.push(r"  \hline".to_string());
+        }
+
+        lines.push(r"\end{array}".to_string());
+        lines.join("\n")
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Event walker
 // ---------------------------------------------------------------------------
@@ -221,6 +340,7 @@ struct EventWalker {
     stack: Vec<StackFrame>,
     link_url: Option<String>,
     pending_code_lang: Option<String>,
+    table_state: Option<TableState>,
 }
 
 impl EventWalker {
@@ -323,13 +443,32 @@ impl EventWalker {
                             self.link_url = Some(dest_url.to_string());
                         }
                         Tag::Image { dest_url, .. } => {
+                            if self.table_state.is_some() {
+                                // Suppress image blocks inside table cells.
+                                self.link_url = Some(dest_url.to_string());
+                            } else {
+                                if ctx.blockquote_buf.is_some() {
+                                    builder =
+                                        flush_blockquote(builder, &self.active_parent, ctx)?;
+                                    self.stack.pop();
+                                }
+                                builder = flush_pending_text(builder, &self.active_parent, ctx)?;
+                                self.link_url = Some(dest_url.to_string());
+                            }
+                        }
+                        Tag::Table(alignments) => {
+                            builder = flush_pending_text(builder, &self.active_parent, ctx)?;
                             if ctx.blockquote_buf.is_some() {
-                                builder =
-                                    flush_blockquote(builder, &self.active_parent, ctx)?;
+                                builder = flush_blockquote(builder, &self.active_parent, ctx)?;
                                 self.stack.pop();
                             }
-                            builder = flush_pending_text(builder, &self.active_parent, ctx)?;
-                            self.link_url = Some(dest_url.to_string());
+                            self.table_state = Some(TableState::new(alignments.to_vec()));
+                        }
+                        Tag::TableHead | Tag::TableRow => {}
+                        Tag::TableCell => {
+                            if let Some(state) = self.table_state.as_mut() {
+                                state.cur_cell = CellAccumulator::new();
+                            }
                         }
 
                         _ => {}
@@ -429,7 +568,9 @@ impl EventWalker {
                             self.link_url = None;
                         }
                         TagEnd::Image => {
-                            if let Some(url) = self.link_url.take() {
+                            if self.table_state.is_some() {
+                                self.link_url = None;
+                            } else if let Some(url) = self.link_url.take() {
                                 let alt = std::mem::take(&mut ctx.pending_text).trim().to_string();
                                 let alt_cloned = alt.clone();
                                 builder = add_block(
@@ -444,6 +585,31 @@ impl EventWalker {
                                 )?;
                             }
                         }
+                        TagEnd::TableCell => {
+                            if let Some(state) = self.table_state.as_mut() {
+                                let cell_tex = std::mem::replace(&mut state.cur_cell, CellAccumulator::new()).build();
+                                state.cur_row.push(cell_tex);
+                            }
+                        }
+                        TagEnd::TableRow | TagEnd::TableHead => {
+                            if let Some(state) = self.table_state.as_mut() {
+                                if !state.cur_row.is_empty() {
+                                    state.rows.push(std::mem::take(&mut state.cur_row));
+                                }
+                            }
+                        }
+                        TagEnd::Table => {
+                            if let Some(state) = self.table_state.take() {
+                                let latex = state.build_latex();
+                                builder = add_block(
+                                    &self.active_parent,
+                                    "math_block",
+                                    builder,
+                                    ctx,
+                                    |b, id| Ok(b.constraint(id, "tex", &latex)),
+                                )?;
+                            }
+                        }
                         _ => {}
                     }
                 }
@@ -452,14 +618,24 @@ impl EventWalker {
                 // Content events
                 // =====================================================================
                 Event::Text(text) => {
-                    append_text(ctx, &text);
+                    if let Some(state) = self.table_state.as_mut() {
+                        state.cur_cell.push_text(&text);
+                    } else {
+                        append_text(ctx, &text);
+                    }
                 }
                 Event::Code(code) => {
-                    append_text(ctx, &code);
+                    if let Some(state) = self.table_state.as_mut() {
+                        state.cur_cell.push_text(&code);
+                    } else {
+                        append_text(ctx, &code);
+                    }
                 }
                 Event::Html(_) | Event::InlineHtml(_) => {}
                 Event::SoftBreak | Event::HardBreak => {
-                    if ctx.blockquote_buf.is_some() {
+                    if let Some(state) = self.table_state.as_mut() {
+                        state.cur_cell.push_space();
+                    } else if ctx.blockquote_buf.is_some() {
                         if let Some(ref mut b) = ctx.blockquote_buf {
                             if !b.is_empty() && !b.ends_with(' ') && !b.ends_with('\n') {
                                 b.push(' ');
@@ -470,35 +646,44 @@ impl EventWalker {
                     }
                 }
                 Event::Rule => {
-                    if ctx.blockquote_buf.is_some() {
-                        builder = flush_blockquote(builder, &self.active_parent, ctx)?;
-                        self.stack.pop();
+                    if self.table_state.is_some() {
+                        // Suppress horizontal rules inside table cells.
+                    } else {
+                        if ctx.blockquote_buf.is_some() {
+                            builder = flush_blockquote(builder, &self.active_parent, ctx)?;
+                            self.stack.pop();
+                        }
+                        builder = flush_pending_text(builder, &self.active_parent, ctx)?;
+                        builder = add_block(
+                            &self.active_parent,
+                            "thematic_break",
+                            builder,
+                            ctx,
+                            |b, _id| Ok(b),
+                        )?;
                     }
-                    builder = flush_pending_text(builder, &self.active_parent, ctx)?;
-                    builder = add_block(
-                        &self.active_parent,
-                        "thematic_break",
-                        builder,
-                        ctx,
-                        |b, _id| Ok(b),
-                    )?;
                 }
                 Event::InlineMath(tex) => {
-                    // Inline math is converted to Unicode and merged into
-                    // the surrounding text block rather than emitted as a
-                    // standalone `math` block.
-                    let unicode = latex_to_unicode(&tex);
-                    append_text(ctx, &unicode);
+                    if let Some(state) = self.table_state.as_mut() {
+                        state.cur_cell.push_math(&tex);
+                    } else {
+                        let unicode = latex_to_unicode(&tex);
+                        append_text(ctx, &unicode);
+                    }
                 }
                 Event::DisplayMath(tex) => {
-                    if ctx.blockquote_buf.is_some() {
-                        builder = flush_blockquote(builder, &self.active_parent, ctx)?;
-                        self.stack.pop();
+                    if let Some(state) = self.table_state.as_mut() {
+                        state.cur_cell.push_math(&tex);
+                    } else {
+                        if ctx.blockquote_buf.is_some() {
+                            builder = flush_blockquote(builder, &self.active_parent, ctx)?;
+                            self.stack.pop();
+                        }
+                        builder = flush_pending_text(builder, &self.active_parent, ctx)?;
+                        builder = add_block(&self.active_parent, "math_block", builder, ctx, |b, id| {
+                            Ok(b.constraint(id, "tex", &tex))
+                        })?;
                     }
-                    builder = flush_pending_text(builder, &self.active_parent, ctx)?;
-                    builder = add_block(&self.active_parent, "math_block", builder, ctx, |b, id| {
-                        Ok(b.constraint(id, "tex", &tex))
-                    })?;
                 }
                 Event::FootnoteReference(_) | Event::TaskListMarker(_) => {}
             }
