@@ -32,6 +32,10 @@ jobs:
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
+      - name: Clone panproto
+        run: |
+          cd ..
+          git clone https://github.com/panproto/panproto.git
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -72,6 +76,10 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - name: Clone panproto
+        run: |
+          cd ..
+          git clone https://github.com/panproto/panproto.git
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
