@@ -35,7 +35,7 @@ jobs:
       - name: Clone panproto
         run: |
           cd ..
-          git clone https://github.com/panproto/panproto.git
+          git clone --branch v0.30.0 --depth 1 https://github.com/panproto/panproto.git
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -79,7 +79,7 @@ jobs:
       - name: Clone panproto
         run: |
           cd ..
-          git clone https://github.com/panproto/panproto.git
+          git clone --branch v0.30.0 --depth 1 https://github.com/panproto/panproto.git
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
