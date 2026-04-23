@@ -15,8 +15,8 @@ fn simple_table_to_math_block() {
     assert!(tex_str.contains(r"\begin{array}"), "missing \\begin{{array}}: {tex_str}");
     assert!(tex_str.contains(r"\end{array}"), "missing \\end{{array}}: {tex_str}");
     assert!(tex_str.contains(r"\hline"), "missing \\hline: {tex_str}");
-    // Check there are no vertical bars in the column spec.
-    assert!(!tex_str.contains("|"), "vertical bar found in array spec: {tex_str}");
+    // Grid tables should have vertical borders.
+    assert!(tex_str.contains("|"), "expected vertical bars for grid: {tex_str}");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn table_alignment_columns() {
     assert_eq!(bs.len(), 1);
     assert_eq!(block_type(&bs[0]), "pub.leaflet.blocks.math");
     let tex_str = tex(&bs[0]);
-    assert!(tex_str.contains("{lcr}"), "expected lcr alignment in: {tex_str}");
+    assert!(tex_str.contains("{|l|c|r|}"), "expected lcr alignment in: {tex_str}");
 }
 
 #[test]

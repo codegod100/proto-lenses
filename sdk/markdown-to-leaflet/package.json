@@ -1,6 +1,6 @@
 {
   "name": "@nandithebull/markdown-to-leaflet",
-  "version": "0.31.1",
+  "version": "0.31.2",
   "description": "TypeScript SDK for the markdown-to-leaflet converter",
   "type": "module",
   "main": "index.js",

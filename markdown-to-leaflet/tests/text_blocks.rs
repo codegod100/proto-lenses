@@ -69,19 +69,39 @@ fn no_empty_text_blocks() {
 }
 
 #[test]
-fn soft_break_coalesces_to_space() {
+fn soft_break_preserves_newline() {
     let json = convert("Line one\nLine two.");
     let bs = blocks(&json);
     assert_eq!(bs.len(), 1);
-    assert_eq!(plaintext(&bs[0]), "Line one Line two.");
+    assert_eq!(plaintext(&bs[0]), "Line one\nLine two.");
 }
 
 #[test]
-fn hard_break_via_two_spaces() {
+fn hard_break_preserves_newline() {
     let json = convert("Line one  \nLine two.");
     let bs = blocks(&json);
-    // Hard break still becomes a space in our parser
-    assert_eq!(plaintext(&bs[0]), "Line one Line two.");
+    assert_eq!(plaintext(&bs[0]), "Line one\nLine two.");
+}
+
+#[test]
+fn multiline_text_block() {
+    let md = r#"$Server$: $n$ $\leftarrow$ Server is a **Noun**
+$Needs$: $n^r \otimes s \otimes n^l$ $\leftarrow$ **Noun** needs a **Noun**
+$Database$: $n \leftarrow$ Database is also a **Noun**
+$Data$: $n$"#;
+    let json = convert(md);
+    let bs = blocks(&json);
+    assert_eq!(bs.len(), 1);
+    assert_eq!(block_type(&bs[0]), "pub.leaflet.blocks.text");
+    let text = plaintext(&bs[0]);
+    println!("multiline_text_block: {:?}", text);
+    assert!(text.contains("Server"), "missing Server: {}", text);
+    assert!(text.contains("Noun"), "missing Noun: {}", text);
+    assert!(text.contains("Needs"), "missing Needs: {}", text);
+    assert!(text.contains("Database"), "missing Database: {}", text);
+    assert!(text.contains("Data"), "missing Data: {}", text);
+    // Should contain newlines, not be one long line
+    assert!(text.contains('\n'), "expected newlines preserved: {}", text);
 }
 
 #[test]

@@ -118,7 +118,8 @@ exports[`convertMarkdown > matches snapshot for rich document 1`] = `
             "$type": "pub.leaflet.pages.linearDocument#block",
             "block": {
               "$type": "pub.leaflet.blocks.blockquote",
-              "plaintext": "A famous quote. Spread across lines.",
+              "plaintext": "A famous quote.
+Spread across lines.",
             },
           },
           {

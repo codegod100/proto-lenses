@@ -79,7 +79,7 @@ fn append_text(ctx: &mut Context, fragment: &str) {
     if fragment.is_empty() {
         return;
     }
-    if !buf.is_empty() && !buf.ends_with(' ') {
+    if !buf.is_empty() && !buf.ends_with(|c: char| c.is_ascii_whitespace()) {
         let prev_ends_with_opener =
             buf.ends_with(|c: char| c == '(' || c == '[' || c == '{');
         let next_starts_with_closer_or_punct = fragment.starts_with(|c: char| {
@@ -302,7 +302,9 @@ impl TableState {
             })
             .collect::<String>();
 
-        let mut lines = vec![format!(r"\begin{{array}}{{{}}}", cols)];
+        let grid = cols.chars().map(|c| format!("|{}", c)).collect::<String>() + "|";
+
+        let mut lines = vec![format!(r"\begin{{array}}{{{}}}", grid)];
         lines.push(r"  \hline".to_string());
 
         for row in self.rows {
@@ -637,12 +639,12 @@ impl EventWalker {
                         state.cur_cell.push_space();
                     } else if ctx.blockquote_buf.is_some() {
                         if let Some(ref mut b) = ctx.blockquote_buf {
-                            if !b.is_empty() && !b.ends_with(' ') && !b.ends_with('\n') {
-                                b.push(' ');
+                            if !b.is_empty() && !b.ends_with(|c: char| c.is_ascii_whitespace()) {
+                                b.push('\n');
                             }
                         }
                     } else {
-                        ctx.pending_text.push(' ');
+                        ctx.pending_text.push('\n');
                     }
                 }
                 Event::Rule => {

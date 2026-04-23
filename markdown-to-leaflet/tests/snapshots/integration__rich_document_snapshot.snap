@@ -1,5 +1,5 @@
 ---
-source: markdown/tests/integration.rs
+source: markdown-to-leaflet/tests/integration.rs
 assertion_line: 42
 expression: json
 ---
@@ -119,7 +119,7 @@ expression: json
             "$type": "pub.leaflet.pages.linearDocument#block",
             "block": {
               "$type": "pub.leaflet.blocks.blockquote",
-              "plaintext": "A famous quote. Spread across lines."
+              "plaintext": "A famous quote.\nSpread across lines."
             }
           },
           {

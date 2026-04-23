@@ -4,8 +4,12 @@ members = [
     "leaflet-protocol",
     "latex-to-leaflet",
     "latex-to-leaflet-napi",
+    "latex-to-markdown",
+    "latex-to-markdown-napi",
+    "latex-to-markdown-wasm",
     "markdown-to-leaflet",
     "markdown-to-leaflet-napi",
+    "markdown-to-leaflet-wasm",
 ]
 
 [workspace.package]
@@ -34,6 +38,8 @@ panproto-grammars = { path = "../panproto/crates/panproto-grammars", version = "
 leaflet-protocol = { path = "leaflet-protocol" }
 markdown-to-leaflet = { path = "markdown-to-leaflet" }
 latex-to-leaflet = { path = "latex-to-leaflet" }
+latex-to-markdown = { path = "latex-to-markdown" }
+latex-to-markdown-napi = { path = "latex-to-markdown-napi" }
 napi = { version = "2", default-features = false, features = ["napi4", "serde-json"] }
 napi-derive = "2"
 napi-build = "2"
