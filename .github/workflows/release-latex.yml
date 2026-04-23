@@ -1,0 +1,111 @@
+name: Release latex-to-leaflet
+
+on:
+  push:
+    tags:
+      - 'latex-to-leaflet-v*'
+
+env:
+  CARGO_INCREMENTAL: 1
+  APP_NAME: latex-to-leaflet
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+          - host: macos-latest
+            target: aarch64-apple-darwin
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    name: stable - ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.settings.target }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.napi-rs
+            target/
+          key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
+      - name: Build
+        working-directory: latex-to-leaflet-napi
+        run: |
+          npm install -g @napi-rs/cli@2
+          napi build --platform --release --target ${{ matrix.settings.target }}
+        shell: bash
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: latex-to-leaflet-napi/*.node
+          if-no-files-found: error
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        working-directory: sdk/latex-to-leaflet
+        run: npm install
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Move artifacts into binding dir
+        run: |
+          mkdir -p sdk/latex-to-leaflet/binding
+          for f in artifacts/bindings-*/*.node; do
+            cp "$f" sdk/latex-to-leaflet/binding/
+          done
+          ls -la sdk/latex-to-leaflet/binding/*.node
+        shell: bash
+      - name: Generate JS binding loader
+        run: |
+          npm install -g @napi-rs/cli@2
+          cd latex-to-leaflet-napi
+          napi build --platform --release
+          cp index.js ../sdk/latex-to-leaflet/binding/binding.cjs
+          cp index.d.ts ../sdk/latex-to-leaflet/binding/binding.d.ts
+      - name: Build TypeScript
+        working-directory: sdk/latex-to-leaflet
+        run: npx tsc
+      - name: Publish to npm
+        working-directory: sdk/latex-to-leaflet
+        run: |
+          npm config set provenance true
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

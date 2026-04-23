@@ -1,6 +1,6 @@
 {
   "name": "@nandithebull/latex-to-leaflet",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "TypeScript SDK for the latex-to-leaflet converter",
   "type": "module",
   "main": "index.js",
