@@ -40,6 +40,7 @@ pub fn protocol() -> Protocol {
             "facet".into(),
             "title".into(),
             "description".into(),
+            "display".into(),
         ],
         has_order: true,
         nominal_identity: true,

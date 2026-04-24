@@ -7,13 +7,16 @@ license.workspace = true
 repository.workspace = true
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
 serde-wasm-bindgen = "0.6"
 markdown-to-leaflet = { workspace = true }
 leaflet-protocol = { workspace = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
 
 [lints.rust]
 unsafe_code = "allow"

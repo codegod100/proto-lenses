@@ -53,14 +53,17 @@ pub fn markdown_to_leaflet_schema(
 
 /// Load and compile the Markdown → Leaflet lens spec.
 ///
-/// The spec is embedded at compile time from `theories/markdown_to_leaflet.ncl`.
+/// The spec is embedded at compile time from `theories/markdown_to_leaflet.json`
+/// and deserialized via `serde_json::from_str`. This avoids Nickel evaluation
+/// at runtime (which panics in WASM due to `temp_dir` / filesystem usage).
 fn markdown_to_leaflet_chain()
     -> Result<&'static panproto_lens::ProtolensChain, MarkdownLeafletError>
 {
     static CHAIN: LazyLock<Result<panproto_lens::ProtolensChain, String>> = LazyLock::new(|| {
-        let source = include_str!("../theories/markdown_to_leaflet.ncl");
-        panproto_lens_dsl::eval::eval_nickel(source, &[])
-            .and_then(|doc| panproto_lens_dsl::compile(&doc, "document", &|_| None))
+        let source = include_str!("../theories/markdown_to_leaflet.json");
+        let doc: panproto_lens_dsl::LensDocument = serde_json::from_str(source)
+            .map_err(|e| format!("JSON parse failed: {e}"))?;
+        panproto_lens_dsl::compile(&doc, "document", &|_| None)
             .map(|c| c.chain)
             .map_err(|e| e.to_string())
     });

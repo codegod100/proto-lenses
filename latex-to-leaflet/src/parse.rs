@@ -252,7 +252,10 @@ fn walk_node(
             }
             let tex = node_text(node, ctx.source).trim().to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| {
+                let b = b.constraint(id, "tex", &tex);
+                Ok(b.constraint(id, "display", "true"))
+            })
         }
         "displayed_equation" => {
             if !ctx.in_body {
@@ -267,7 +270,10 @@ fn walk_node(
                 .trim()
                 .to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| {
+                let b = b.constraint(id, "tex", &tex);
+                Ok(b.constraint(id, "display", "true"))
+            })
         }
         "inline_formula" => {
             if !ctx.in_body {
@@ -282,7 +288,10 @@ fn walk_node(
                 .trim()
                 .to_string();
             builder = flush_pending_text(builder, parent_id, ctx)?;
-            add_block(parent_id, "equation", builder, ctx, |b, id| Ok(b.constraint(id, "tex", &tex)))
+            add_block(parent_id, "equation", builder, ctx, |b, id| {
+                let b = b.constraint(id, "tex", &tex);
+                Ok(b.constraint(id, "display", "false"))
+            })
         }
         "verbatim_environment" => {
             if !ctx.in_body {

@@ -67,9 +67,32 @@ jobs:
           path: markdown-to-leaflet-napi/*.node
           if-no-files-found: error
 
+  wasm-test:
+    name: WASM Node tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone panproto
+        run: |
+          cd ..
+          git clone --branch v0.30.0 --depth 1 https://github.com/panproto/panproto.git
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Run WASM tests
+        working-directory: markdown-to-leaflet-wasm
+        run: wasm-pack test --node
+
   publish:
     name: Publish
-    needs: build
+    needs: [build, wasm-test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
