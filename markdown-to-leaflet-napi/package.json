@@ -1,6 +1,6 @@
 {
   "name": "markdown-to-leaflet",
-  "version": "0.30.3",
+  "version": "0.30.4",
   "napi": {
     "name": "markdown-to-leaflet",
     "triples": {}
